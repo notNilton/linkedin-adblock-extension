@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "LinkedIn Feed Adblock",
+  "version": "1.0.0",
+  "description": "Remove posts patrocinados e sugeridos do feed do LinkedIn.",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "linkedin-adblock@nilbyte.local",
+      "strict_min_version": "128.0"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.linkedin.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
