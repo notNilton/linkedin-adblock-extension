@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "LinkedIn Feed Adblock",
   "version": "1.0.0",
-  "description": "Remove posts patrocinados e sugeridos do feed do LinkedIn.",
+  "description": "Removes sponsored and suggested posts from the LinkedIn feed.",
   "browser_specific_settings": {
     "gecko": {
       "id": "linkedin-adblock@nilbyte.local",

@@ -1,5 +1,5 @@
-// Remove posts patrocinados e sugeridos do feed do LinkedIn.
-// Roda no contexto da página (world: "MAIN") para poder interceptar window.fetch.
+// Removes sponsored and suggested posts from the LinkedIn feed.
+// Runs in the page context (world: "MAIN") to intercept window.fetch.
 
 (function () {
   "use strict";
@@ -11,7 +11,7 @@
   const stats = { promoted: 0, suggested: 0, hiddenCards: 0 };
 
   // ---------------------------------------------------------------------
-  // 1. Rede: limpa as respostas da API do feed antes de renderizar
+  // 1. Network: cleans feed API payloads before rendering
   // ---------------------------------------------------------------------
   const originalFetch = window.fetch;
 
@@ -37,12 +37,12 @@
       Object.defineProperty(cleaned, "url", { value: response.url });
       return cleaned;
     } catch {
-      return response; // Na dúvida, entrega a resposta original
+      return response; // When in doubt, return original response
     }
   };
 
-  // Compara só valores de texto exatos: `"promoted":false` é uma chave, e
-  // "promoted to VP" é um post normal. Nenhum dos dois deve ser removido.
+  // Only matches exact text values: `"promoted":false` is a key, and
+  // "promoted to VP" is a normal post. Neither should be removed.
   function hasLabel(dump, labels) {
     return labels.some((label) => dump.includes(`:"${label}"`));
   }
@@ -60,7 +60,7 @@
     return hasLabel(dump, SUGGESTED_LABELS) ? "suggested" : null;
   }
 
-  // Altera `data` no lugar. Retorna true se removeu alguma coisa.
+  // Mutates `data` in-place. Returns true if anything was removed.
   function filterFeedPayload(data) {
     if (!Array.isArray(data?.included)) return false;
 
@@ -79,7 +79,7 @@
     return true;
   }
 
-  // Tira os URNs removidos de qualquer lista da resposta, em qualquer nível.
+  // Removes stripped URNs from any response list at any nesting level.
   function pruneReferences(node, badUrns) {
     if (Array.isArray(node)) {
       for (let i = node.length - 1; i >= 0; i--) {
@@ -94,7 +94,7 @@
   }
 
   // ---------------------------------------------------------------------
-  // 2. Página: esconde o que passar pela rede, inclusive no scroll infinito
+  // 2. Page: hides whatever bypasses network filter, including infinite scroll
   // ---------------------------------------------------------------------
   function findCard(el) {
     for (let cur = el; cur && cur !== document.body; cur = cur.parentElement) {
@@ -121,8 +121,8 @@
   }
 
   function scan(root) {
-    // Só no feed: em /jobs, "Promoted" marca uma vaga dentro de uma lista,
-    // e subir até o card esconderia a lista inteira.
+    // Only in feed: in /jobs, "Promoted" tags a job inside a list,
+    // and traversing up to the card would hide the entire list.
     if (!location.pathname.startsWith("/feed")) return;
     if (root.matches?.("span, p")) hideLabel(root);
     root.querySelectorAll("span, p").forEach(hideLabel);
